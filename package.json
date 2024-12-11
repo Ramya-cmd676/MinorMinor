@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "openai": "^4.76.1",
+    "puppeteer": "^23.10.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.4.0",
+    "react-router-dom": "^7.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/sqlite3": "^3.1.11"
+  }
+}
