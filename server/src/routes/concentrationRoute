@@ -1,0 +1,8 @@
+import express from 'express';
+import { concentration } from '../controllers/concentrationController';
+
+const router = express.Router();
+
+router.get('/', concentration);
+
+export default router;

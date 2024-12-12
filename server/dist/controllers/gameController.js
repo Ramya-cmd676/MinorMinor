@@ -42,7 +42,7 @@ const startGame = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.query.userId;
     try {
         const concentrationDuration = yield getUserConcentrationDuration(parseInt(userId));
-        const durationInMs = concentrationDuration * 60 * 1000;
+        const durationInMs = 5000; //concentrationDuration * 60 * 1000;
         setTimeout(() => {
             const gamePrompt = getRandomGamePrompt();
             res.status(200).json({ gamePrompt });
