@@ -26,7 +26,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction): P
     ]);
 
     // Send success response
-    res.status(201).json({ success: true, message: 'Signup successful' });
+    res.status(201).json({ success: true, message: 'Signup successful', });
   } catch (error) {
     console.error(error);
     next(error); // Pass errors to Express's error handler
