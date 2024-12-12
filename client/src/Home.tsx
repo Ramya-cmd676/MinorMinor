@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { FaCalendarAlt } from 'react-icons/fa';
-import ChatbotPopup from './ChatbotPopup'; // Chatbot popup component
-import Game from './Game'; // Game component
-import { addCalendarEvent } from './services/apiService'; // API service
-import axios from 'axios'; // Axios for API requests
-import Mental from './Mental'; // Import the MentalFunction component
+import { FaCalendarAlt } from 'react-icons/fa'; // Importing a calendar icon
+import ChatbotPopup from './ChatbotPopup';
+import { addCalendarEvent } from './services/apiService'; // Importing the API service
+import axios from 'axios'; // Importing axios
 import './Courses.css';
 import './Chatbot.css';
-import './Home.css';
+import Game from './Game'; // Game component
+import Mental from './Mental';
 
 const Courses: React.FC = () => {
     const [showGame, setShowGame] = useState(false);
@@ -24,7 +23,7 @@ const Courses: React.FC = () => {
     const [eventDate, setEventDate] = useState('');
     const [events, setEvents] = useState<{ title: string; date: string }[]>([]);
 
-    // Fetch courses
+    // Fetching courses
     useEffect(() => {
         const fetchCourses = async () => {
             try {
@@ -32,9 +31,14 @@ const Courses: React.FC = () => {
                 const response = await axios.get('http://localhost:5000/api/courses/scrape', {
                     params: { query },
                 });
-                setCourses(response.data.courses || []);
+                if (response.data && response.data.courses) {
+                    setCourses(response.data.courses);
+                } else {
+                    setCourses([]);
+                }
             } catch (error) {
                 console.error('Error fetching courses:', error);
+                setCourses([]); // Set to empty array on error
             } finally {
                 setLoading(false);
             }
@@ -43,6 +47,7 @@ const Courses: React.FC = () => {
     }, [query]);
 
     const getYouTubeEmbedLink = (url: string) => {
+        if (!url.includes('v=')) return '';
         const videoId = url.split('v=')[1]?.split('&')[0];
         return `https://www.youtube.com/embed/${videoId}`;
     };
@@ -53,8 +58,9 @@ const Courses: React.FC = () => {
             const newEvent = { title: eventTitle, date: eventDate };
             setEvents([...events, newEvent]);
 
+            // Call the API to add the event
             try {
-                await addCalendarEvent(1, eventTitle, eventDate); // Assuming userId = 1
+                await addCalendarEvent(1, eventTitle, eventDate); // Assuming userId is 1 for now
             } catch (error) {
                 console.error('Error adding event:', error);
             }
@@ -67,27 +73,28 @@ const Courses: React.FC = () => {
     // Set the timing from localStorage when the component mounts
     useEffect(() => {
         const savedTiming = localStorage.getItem('concentration_duration');
-        console.log("saved: ",savedTiming);
         if (savedTiming) {
             const parsedTiming = Number(savedTiming);
-            setTiming(parsedTiming);
+            setTiming(isNaN(parsedTiming) ? 0 : parsedTiming);
         }
     }, []);
 
     // Trigger mental function automatically after timing interval
     useEffect(() => {
-        console.log("i am timing: ",timing);
         if (timing > 0) {
             const interval = setInterval(() => {
                 setShowMental(true);
             }, timing * 60 * 60 * 1000); // Convert hours to milliseconds
 
             // Enable the "Start Game" button after the interval
-            setTimeout(() => {
+            const timeout = setTimeout(() => {
                 setGameEnabled(true); // Enable game button after the specified time has passed
             }, timing * 60 * 60 * 1000);
 
-            return () => clearInterval(interval); // Cleanup
+            return () => {
+                clearInterval(interval);
+                clearTimeout(timeout);
+            }; // Cleanup
         }
     }, [timing]);
 
@@ -114,42 +121,44 @@ const Courses: React.FC = () => {
             ) : (
                 <>
                     <h1>Welcome to Course Finder</h1>
-                    <div className="courses-box">
-                        <h2 className="courses-title">Courses</h2>
-                        {courses.length === 0 ? (
-                            <div>No courses found.</div>
-                        ) : (
-                            <div className="courses-container">
-                                {courses.map((course: any) => (
-                                    <div key={course.id} className="course-item">
-                                        <h3 className="course-title">{course.title}</h3>
-                                        <iframe
-                                            className="course-video"
-                                            src={`https://www.youtube.com/embed/${new URLSearchParams(
-                                                course.link.split('?')[1]
-                                            ).get('v')}`}
-                                            title={course.title}
-                                            frameBorder="0"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowFullScreen
-                                        ></iframe>
-                                    </div>
-                                ))}
+                    <h2>Courses</h2>
+                    {loading && <div className="loading">Loading courses...</div>}
+                    {!loading && courses.length === 0 && <div>No courses found.</div>}
+
+                    <div className="courses-container">
+                        {courses.map((course: any) => (
+                            <div key={course.id} className="course-item">
+                                <h3 className="course-title">{course.title}</h3>
+                                <iframe
+                                    className="course-video"
+                                    src={getYouTubeEmbedLink(course.link)}
+                                    title={course.title}
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                ></iframe>
                             </div>
-                        )}
+                        ))}
                     </div>
 
                     {/* Start Game Button: only shows after 'timing' hours */}
-                    {//timing > 0 && (
-                        <button
-                            onClick={handleGameClick}
-                            className="game-button"
-                            disabled={!gameEnabled} // Disable button until timing is reached
-                        >
-                            Start Game
-                        </button>
-                    //)
-                    }
+                    <button
+                        onClick={handleGameClick}
+                        className="game-button"
+                        disabled={!gameEnabled} // Disable button until timing is reached
+                    >
+                        Start Game
+                    </button>
+
+                    <div className="chatbot-icon" onClick={() => setIsPopupOpen(true)}>
+                        <img src="/chatbot-icon.png" alt="Chatbot" />
+                    </div>
+                    {isPopupOpen && (
+                        <ChatbotPopup
+                            closePopup={() => setIsPopupOpen(false)}
+                            onSubmit={(newQuery) => setQuery(newQuery)}
+                        />
+                    )}
 
                     {/* Calendar Section */}
                     <div className="calendar-container">
@@ -166,7 +175,7 @@ const Courses: React.FC = () => {
                                 value={eventDate}
                                 onChange={(e) => setEventDate(e.target.value)}
                             />
-                            <button type="submit" className="add-event-button">Add Event</button>
+                            <button type="submit">Add Event</button>
                         </form>
                         <ul>
                             {events.map((event, index) => (
@@ -175,29 +184,15 @@ const Courses: React.FC = () => {
                         </ul>
                     </div>
 
-                    {/* Chatbot Section */}
-                    <div className="chatbot-section">
-                        <div className="chatbot-icon" onClick={() => setIsPopupOpen(true)}>
-                            <img src="/chatbot-icon.png" alt="Chatbot" />
-                        </div>
-                        {isPopupOpen && (
-                            <ChatbotPopup
-                                closePopup={() => setIsPopupOpen(false)}
-                                onSubmit={(newQuery) => setQuery(newQuery)}
-                            />
-                        )}
-                    </div>
-
                     {/* Mental Function Full-Screen */}
-                        {showMental && (
-                            <div className="mental-fullscreen">
-                                <button className="close-button" onClick={handleCloseMental}>
-                                    Close
-                                </button>
-                                <Mental /> {/* Render as a component */}
-                            </div>
-                        )}
-
+                    {showMental && (
+                        <div className="mental-fullscreen">
+                            <button className="close-button" onClick={handleCloseMental}>
+                                Close
+                            </button>
+                            <Mental /> {/* Render as a component */}
+                        </div>
+                    )}
                 </>
             )}
         </div>
