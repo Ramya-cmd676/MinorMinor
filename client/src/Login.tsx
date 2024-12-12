@@ -17,6 +17,8 @@ const Login: React.FC = () => {
       const response = await axios.get('http://localhost:5000/api/login', {
         params: { username, password },
       });
+      console.log('Response from backend:', response.data);
+      console.log('User:', response.data.user);
 
       if (response.data.success) {
         setMessage('Login successful!');
@@ -25,6 +27,9 @@ const Login: React.FC = () => {
         // Store the username and userId in localStorage
         localStorage.setItem('username', username);
         localStorage.setItem('userId', response.data.userId);
+        localStorage.setItem('concentration_duration',response.data.concentration_duration);
+        console.log('hi',response.data.user.userid);
+        console.log(response.data.user);
       } else {
         setMessage('Invalid username or password.');
       }
@@ -42,6 +47,11 @@ const Login: React.FC = () => {
   if (showSignup) {
     return <Signup />;
   }
+
+  console.log('Stored Username:', localStorage.getItem('username'));
+  console.log('Stored UserId:', localStorage.getItem('userId'));
+  console.log('Stored Concentration-duration:', localStorage.getItem('concentration_duration'));
+
 
   return (
     <div>

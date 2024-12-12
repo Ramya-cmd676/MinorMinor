@@ -6,7 +6,6 @@ import loginRoute from './routes/loginRoute'; // Replace with the correct path t
 import courseRouter from './routes/courseRouter'; // Replace with the correct path to your course router
 import signupRoute from './routes/signupRoute';
 import gameRouter from './routes/gameRoute';
-import concentrationRoute from './routes/concentrationRoute';
 
 dotenv.config();
 console.log('OpenAI API Key:', process.env.OPENAI_API_KEY);
@@ -40,7 +39,7 @@ app.use('/api/login', loginRoute); // Login route
 app.use('/api/courses', courseRouter); // Course-related routes
 app.use('/api/signup', signupRoute);
 app.use('/api', gameRouter);
-app.use('/api/users/concentration-duration',concentrationRoute);
+//app.use('/api/users/concentration-duration',concentrationRoute);
 
 // Catch-all route for unknown paths
 app.use((req: Request, res: Response) => {

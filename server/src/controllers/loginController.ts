@@ -8,12 +8,20 @@ export const getLoginData = async (req: Request, res: Response) => {
     const { username, password } = req.query;
 
     const rows = await db.all(
-      'SELECT * FROM users WHERE username = ? AND password = ?;',
+      'SELECT * FROM users WHERE username = ? AND password = ? ;',
       [username, password]
     );
+    console.log('Fetched Rows:', rows);
+
 
     if (rows.length > 0) {
-      res.json({ success: true, message: 'Login successful', user: rows[0] });
+      const user = rows[0]; // Get the first matching user
+      res.json({ 
+        success: true, 
+        message: 'Login successful', 
+        userId: user.userid,
+        concentration_duration: user.concentration_duration,
+      });
     } else {
       res.json({ success: false, message: 'Invalid username or password' });
     }

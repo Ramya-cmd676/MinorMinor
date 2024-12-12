@@ -7,6 +7,7 @@ import axios from 'axios'; // Axios for API requests
 import Mental from './Mental'; // Import the MentalFunction component
 import './Courses.css';
 import './Chatbot.css';
+import './Home.css';
 
 const Courses: React.FC = () => {
     const [showGame, setShowGame] = useState(false);
@@ -15,7 +16,8 @@ const Courses: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [query, setQuery] = useState('');
-    const [concentrationDuration, setConcentrationDuration] = useState<number>(0);
+    const [timing, setTiming] = useState<number>(0); // Store timing from localStorage
+    const [gameEnabled, setGameEnabled] = useState(false); // State to track if game button should be enabled
 
     // Calendar state
     const [eventTitle, setEventTitle] = useState('');
@@ -62,29 +64,32 @@ const Courses: React.FC = () => {
         }
     };
 
-    // Fetch concentration duration and set interval for mental function
+    // Set the timing from localStorage when the component mounts
     useEffect(() => {
-        const fetchConcentrationDuration = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/api/users/concentration-duration', {
-                    params: { userId: 1 }, // Replace with actual user ID
-                });
-                const duration = response.data.concentration_duration || 0;
-                setConcentrationDuration(duration);
-
-                if (duration > 0) {
-                    const interval = setInterval(() => {
-                        setShowMental(true);
-                    }, duration * 60 * 1000); // Convert minutes to milliseconds
-
-                    return () => clearInterval(interval); // Cleanup
-                }
-            } catch (error) {
-                console.error('Error fetching concentration duration:', error);
-            }
-        };
-        fetchConcentrationDuration();
+        const savedTiming = localStorage.getItem('concentration_duration');
+        console.log("saved: ",savedTiming);
+        if (savedTiming) {
+            const parsedTiming = Number(savedTiming);
+            setTiming(parsedTiming);
+        }
     }, []);
+
+    // Trigger mental function automatically after timing interval
+    useEffect(() => {
+        console.log("i am timing: ",timing);
+        if (timing > 0) {
+            const interval = setInterval(() => {
+                setShowMental(true);
+            }, timing * 60 * 60 * 1000); // Convert hours to milliseconds
+
+            // Enable the "Start Game" button after the interval
+            setTimeout(() => {
+                setGameEnabled(true); // Enable game button after the specified time has passed
+            }, timing * 60 * 60 * 1000);
+
+            return () => clearInterval(interval); // Cleanup
+        }
+    }, [timing]);
 
     const handleGameClick = () => {
         setShowGame(true);
@@ -134,11 +139,19 @@ const Courses: React.FC = () => {
                         )}
                     </div>
 
-                    <button onClick={() => setShowGame(true)} className="game-button">
-                        Start Game
-                    </button>
+                    {/* Start Game Button: only shows after 'timing' hours */}
+                    {//timing > 0 && (
+                        <button
+                            onClick={handleGameClick}
+                            className="game-button"
+                            disabled={!gameEnabled} // Disable button until timing is reached
+                        >
+                            Start Game
+                        </button>
+                    //)
+                    }
 
-                     {/* Calendar Section */}
+                    {/* Calendar Section */}
                     <div className="calendar-container">
                         <h2><FaCalendarAlt /> Academic Calendar</h2>
                         <form onSubmit={handleEventSubmit}>
@@ -175,17 +188,16 @@ const Courses: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Mental Function Pop-up */}
-                    {showMental && (
-                        <div className="mental-popup">
-                            <div className="mental-container">
+                    {/* Mental Function Full-Screen */}
+                        {showMental && (
+                            <div className="mental-fullscreen">
                                 <button className="close-button" onClick={handleCloseMental}>
                                     Close
                                 </button>
                                 <Mental /> {/* Render as a component */}
                             </div>
-                        </div>
-                    )}
+                        )}
+
                 </>
             )}
         </div>

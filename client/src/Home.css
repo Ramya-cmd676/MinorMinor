@@ -1,89 +1,40 @@
-.courses-wrapper {
-    padding: 20px;
-    text-align: center;
-}
 
-.courses-box {
-    border: 2px solid #007bff;
-    border-radius: 10px;
-    padding: 20px;
-    margin: 20px auto;
-    width: 90%;
-    max-width: 800px;
-}
-
-.courses-title {
-    background-color: #007bff;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
-
-.courses-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-}
-
-.course-item {
-    width: 300px;
-    margin: 10px;
-}
-
-.course-title {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.course-video {
-    border-radius: 10px;
+/* Full-screen mental popup */
+.mental-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 200px;
-}
-
-.game-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.calendar-container {
-    margin: 20px auto;
-    text-align: left;
-    width: 90%;
-    max-width: 600px;
-}
-
-.add-event-button {
-    padding: 10px 15px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
-.chatbot-section {
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.957); /* Slight dark background */
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    margin-top: 20px;
+    z-index: 9999; /* Ensure it's on top of other elements */
 }
 
-.chatbot-icon {
-    margin-top: 10px;
+.mental-container {
+    background-color: #fff;
+    padding: 20px;
+    max-width: 800px;
+    max-height: 90%;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
     cursor: pointer;
 }
 
-.chatbot-icon img {
-    width: 50px;
-    height: 50px;
+.close-button:hover {
+    background-color: darkred;
 }
