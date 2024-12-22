@@ -8,28 +8,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addCalendarEvent = void 0;
-const sqlite_1 = require("sqlite");
-const sqlite3_1 = __importDefault(require("sqlite3"));
+exports.getUserEvents = exports.addCalendarEvent = void 0;
 // Function to add a calendar event
 const addCalendarEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('Received request to add calendar event:', req.body); // Log the incoming request data
     const { userId, title, date } = req.body;
+    // Validate input
     if (!userId || !title || !date) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
     try {
-        const db = yield (0, sqlite_1.open)({
-            filename: './database.sqlite',
-            driver: sqlite3_1.default.Database,
-        });
-        yield db.run(`
-            INSERT INTO calendar (userId, title, date)
-            VALUES (?, ?, ?)`, [userId, title, date]);
+        // Use the database instance from app.locals.db
+        const db = req.app.locals.db;
+        const query = 'INSERT INTO calendar (userId, title, date) VALUES (?, ?, ?)';
+        // Insert the event into the database
+        yield db.run(query, [userId, title, date]);
         return res.status(201).json({ message: 'Event added successfully' });
     }
     catch (error) {
@@ -38,3 +31,27 @@ const addCalendarEvent = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.addCalendarEvent = addCalendarEvent;
+// Function to get all events for a specific user
+const getUserEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.params; // Get userId from route params
+    // Validate userId
+    if (!userId) {
+        return res.status(400).json({ message: 'Missing userId' });
+    }
+    try {
+        // Use the database instance from app.locals.db
+        const db = req.app.locals.db;
+        const query = 'SELECT title, date FROM calendar WHERE userId = ?';
+        // Fetch events from the database
+        const events = yield db.all(query, [userId]);
+        if (events.length === 0) {
+            return res.status(404).json({ message: 'No events found for this user.' });
+        }
+        return res.status(200).json(events); // Return the events in the response
+    }
+    catch (error) {
+        console.error('Error fetching user events:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+exports.getUserEvents = getUserEvents;

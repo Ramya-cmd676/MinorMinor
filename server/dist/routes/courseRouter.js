@@ -25,8 +25,22 @@ router.get('/scrape', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(500).json({ error: 'An error occurred while scraping courses.' });
     }
 }));
-// Specify the HTTP method (POST) and link the handler
-router.post('/calendar', (req, res) => {
-    (0, calendarController_1.addCalendarEvent)(req, res); // Call the function explicitly inside the POST route
-});
+// Route to add a calendar event
+router.post('/calendar', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield (0, calendarController_1.addCalendarEvent)(req, res); // Await for the async function to finish
+    }
+    catch (error) {
+        res.status(500).json({ error: 'An error occurred while adding the event.' });
+    }
+}));
+// Route to get events for a specific user (using userId as a route parameter)
+router.get('/calendar/:userId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield (0, calendarController_1.getUserEvents)(req, res); // Await for the async function to finish
+    }
+    catch (error) {
+        res.status(500).json({ error: 'An error occurred while fetching user events.' });
+    }
+}));
 exports.default = router;

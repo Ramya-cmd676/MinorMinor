@@ -101,15 +101,14 @@ const Game: React.FC<GameProps> = ({ onClose }) => {
             <button 
               onClick={() => handlePlayerTypeSelection('single')}
               style={{
-                backgroundColor: '#009688',
-                color: 'black',
+                color: 'white',
                 padding: '10px 20px',
                 border: 'none',
                 borderRadius: '5px',
                 fontSize: '1em',
                 cursor: 'pointer',
                 transition: 'background-color 0.3s ease',
-                boxShadow: '0 5px 10px rgba(0, 0, 0, 0.2)',
+                boxShadow: '0 5px 10px hsla(189, 7.70%, 82.20%, 0.20)',
               }}
             >
               Single Player
@@ -117,15 +116,14 @@ const Game: React.FC<GameProps> = ({ onClose }) => {
             <button 
               onClick={() => handlePlayerTypeSelection('partner')}
               style={{
-                backgroundColor: '#f44336',
-                color: 'black',
+                color: 'white',
                 padding: '10px 20px',
                 border: 'none',
                 borderRadius: '5px',
                 fontSize: '1em',
                 cursor: 'pointer',
                 transition: 'background-color 0.3s ease',
-                boxShadow: '0 5px 10px rgba(0, 0, 0, 0.2)',
+                boxShadow: '0 5px 10px rgba(240, 231, 231, 0.2)',
               }}
             >
               Partner

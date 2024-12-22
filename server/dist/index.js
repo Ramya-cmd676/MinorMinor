@@ -20,6 +20,7 @@ const loginRoute_1 = __importDefault(require("./routes/loginRoute")); // Replace
 const courseRouter_1 = __importDefault(require("./routes/courseRouter")); // Replace with the correct path to your course router
 const signupRoute_1 = __importDefault(require("./routes/signupRoute"));
 const gameRoute_1 = __importDefault(require("./routes/gameRoute"));
+//import calendarDisplayRouter from './routes/calendarDisplayRoute';
 dotenv_1.default.config();
 console.log('OpenAI API Key:', process.env.OPENAI_API_KEY);
 const app = (0, express_1.default)();
@@ -49,6 +50,7 @@ app.use('/api/login', loginRoute_1.default); // Login route
 app.use('/api/courses', courseRouter_1.default); // Course-related routes
 app.use('/api/signup', signupRoute_1.default);
 app.use('/api', gameRoute_1.default);
+//app.use('/api', calendarDisplayRouter);
 //app.use('/api/users/concentration-duration',concentrationRoute);
 // Catch-all route for unknown paths
 app.use((req, res) => {
