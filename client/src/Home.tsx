@@ -89,7 +89,7 @@ const Courses: React.FC = () => {
             // Enable the "Start Game" button after the interval
             const timeout = setTimeout(() => {
                 setGameEnabled(true); // Enable game button after the specified time has passed
-            }, timing * 60 * 60 * 1000);
+            }, timing  *60*60* 1000);
 
             return () => {
                 clearInterval(interval);

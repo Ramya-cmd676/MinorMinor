@@ -33,7 +33,7 @@ const signup = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
             concentrationDuration,
         ]);
         // Send success response
-        res.status(201).json({ success: true, message: 'Signup successful' });
+        res.status(201).json({ success: true, message: 'Signup successful', });
     }
     catch (error) {
         console.error(error);

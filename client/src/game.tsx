@@ -43,7 +43,6 @@ const Game: React.FC<GameProps> = ({ onClose }) => {
 
     for (let pattern of winPatterns) {
       const [a, b, c] = pattern;
-      // Check if gameState[a] is not an empty string and matches gameState[b] and gameState[c]
       if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
         setWinner(gameState[a] as 'X' | 'O');  // Assert that gameState[a] is either 'X' or 'O'
         updateScore(gameState[a] as 'X' | 'O'); // Update the score if there's a winner
@@ -57,7 +56,6 @@ const Game: React.FC<GameProps> = ({ onClose }) => {
     updatedScores[winner] += 1;  // Increase the score for the winning player
     setPlayerScores(updatedScores);
 
-    // Optionally, you can store this in local storage or a database for persistence.
     localStorage.setItem('playerScores', JSON.stringify(updatedScores));
   };
 
@@ -87,9 +85,53 @@ const Game: React.FC<GameProps> = ({ onClose }) => {
     return (
       <div className="game-container">
         <h1>Welcome to Tic-Tac-Toe</h1>
-        <p>Select your mode:</p>
-        <button onClick={() => handlePlayerTypeSelection('single')}>Single Player</button>
-        <button onClick={() => handlePlayerTypeSelection('partner')}>Partner</button>
+        <h2>Get Ready</h2>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column', // Stack content vertically
+            justifyContent: 'center', // Center content vertically
+            alignItems: 'center', // Center content horizontally
+            height: '50%', // Full viewport height
+            // Optional background color
+          }}
+        >
+          <p style={{ fontSize: '1.2em', marginBottom: '20px' }}>Select your mode:</p>
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <button 
+              onClick={() => handlePlayerTypeSelection('single')}
+              style={{
+                backgroundColor: '#009688',
+                color: 'black',
+                padding: '10px 20px',
+                border: 'none',
+                borderRadius: '5px',
+                fontSize: '1em',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s ease',
+                boxShadow: '0 5px 10px rgba(0, 0, 0, 0.2)',
+              }}
+            >
+              Single Player
+            </button>
+            <button 
+              onClick={() => handlePlayerTypeSelection('partner')}
+              style={{
+                backgroundColor: '#f44336',
+                color: 'black',
+                padding: '10px 20px',
+                border: 'none',
+                borderRadius: '5px',
+                fontSize: '1em',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s ease',
+                boxShadow: '0 5px 10px rgba(0, 0, 0, 0.2)',
+              }}
+            >
+              Partner
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
