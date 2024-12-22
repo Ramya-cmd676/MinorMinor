@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { FaCalendarAlt } from 'react-icons/fa'; // Importing a calendar icon
-import ChatbotPopup from './ChatbotPopup';
 import { addCalendarEvent } from './services/apiService'; // Importing the API service
-import axios from 'axios'; // Importing axios
 import './Courses.css';
 import './Chatbot.css';
-import Game from './Game'; // Game component
-import Mental from './Mental';
-
+import ChatbotPopup from './ChatbotPopup'; // Importing Chatbot component
+import Game from './Game'; // Importing Game component
+import Mental from './Mental'; // Importing Mental component
+import Quiz from './Quiz';
 const Courses: React.FC = () => {
     const [showGame, setShowGame] = useState(false);
     const [showMental, setShowMental] = useState(false);
+    const [showQuiz, setShowQuiz] = useState(false);
     const [courses, setCourses] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [timing, setTiming] = useState<number>(0); // Store timing from localStorage
     const [gameEnabled, setGameEnabled] = useState(false); // State to track if game button should be enabled
+    const [calendarData, setCalendarData] = useState<any[]>([]);
 
     // Calendar state
     const [eventTitle, setEventTitle] = useState('');
@@ -54,22 +56,46 @@ const Courses: React.FC = () => {
 
     const handleEventSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (eventTitle && eventDate) {
+        const userId = parseInt(localStorage.getItem('userId') || '0', 10);
+        if (eventTitle && eventDate && userId) {
             const newEvent = { title: eventTitle, date: eventDate };
-            setEvents([...events, newEvent]);
-
+            setEvents([...events, newEvent]); // Add new event to the state
+    
             // Call the API to add the event
             try {
-                await addCalendarEvent(1, eventTitle, eventDate); // Assuming userId is 1 for now
+                await addCalendarEvent(userId, eventTitle, eventDate); // Call API to add event
             } catch (error) {
                 console.error('Error adding event:', error);
             }
-
-            setEventTitle('');
+    
+            setEventTitle('');  // Clear input fields
             setEventDate('');
         }
     };
 
+    useEffect(() => {
+
+        const fetchCalendarData = async () => {
+          const userId = localStorage.getItem('userId'); // Retrieve user_id from localStorage
+        
+          if (!userId) {
+            console.error('No user ID found in localStorage');
+            return;
+          }
+        
+          try {
+            const response = await axios.get('http://localhost:5000/api/calendarDisplay', {
+              params: { user_id: userId }, // Pass the user_id as a query parameter
+            });
+            console.log(response.data); // Handle the response data
+          } catch (error) {
+            console.error('Error fetching calendar data:', error);
+          }
+        };
+        fetchCalendarData();
+    }, []);
+
+    
     // Set the timing from localStorage when the component mounts
     useEffect(() => {
         const savedTiming = localStorage.getItem('concentration_duration');
@@ -89,7 +115,7 @@ const Courses: React.FC = () => {
             // Enable the "Start Game" button after the interval
             const timeout = setTimeout(() => {
                 setGameEnabled(true); // Enable game button after the specified time has passed
-            }, timing  *60*60* 1000);
+            }, timing * 60 * 60 * 1000);
 
             return () => {
                 clearInterval(interval);
@@ -109,7 +135,16 @@ const Courses: React.FC = () => {
     const handleCloseMental = () => {
         setShowMental(false);
     };
-
+    const handleQuizClick = () => {
+        setShowQuiz(true);
+    };
+    const handleCloseQuiz = () => {
+        setShowQuiz(false);
+    };
+    
+    if (showQuiz) {
+        return <Quiz onClose={handleCloseQuiz} />;
+    }
     if (loading) {
         return <div className="loading">Loading courses...</div>;
     }
@@ -144,11 +179,20 @@ const Courses: React.FC = () => {
                     {/* Start Game Button: only shows after 'timing' hours */}
                     <button
                         onClick={handleGameClick}
+                        style={{marginRight: '20px'}}
                         className="game-button"
                         disabled={!gameEnabled} // Disable button until timing is reached
                     >
                         Start Game
                     </button>
+                    <button
+                        onClick={handleQuizClick}
+                        style={{marginLeft: '20px'}}
+                     // Disable button until timing is reached
+                    >
+                        Take a quiz
+                    </button>
+
 
                     <div className="chatbot-icon" onClick={() => setIsPopupOpen(true)}>
                         <img src="/chatbot-icon.png" alt="Chatbot" />
@@ -177,6 +221,7 @@ const Courses: React.FC = () => {
                             />
                             <button type="submit">Add Event</button>
                         </form>
+
                         <ul>
                             {events.map((event, index) => (
                                 <li key={index}>{event.title} on {event.date}</li>
